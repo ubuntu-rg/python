@@ -1,0 +1,34 @@
+1. Encapsulation -
+    organizing all the methods within the class in the right order
+    making sure what can be edited and what not with the @property decorator.
+    settings setters to attributes to make sure how attribute can be changed
+
+2. Abstraction
+    make sure that not all the data is presented to the user. Not everything should be shown
+    to make sure that a user cannot see a method within the class, add double underscore to the
+    name of the method. i.e:
+    def __connect(self):
+        username = "user"
+        password = "1234"
+
+    double underscore will convert the method to private method.
+
+3. Inheritance
+    mechanism that allows to reuse code between classes.
+    the main class is the parent and the inheritance class is the child.
+
+4. Polymorphism
+   refers to use of a single type entity to represent different types in different scenarios.
+   poly = many
+   morphism = forms
+   make sure to have different ways to execute the same thing.
+
+   for example:
+   name = "Joe"
+   print(len(name))
+
+   arr = [1 ,2]
+   print(len(arr))
+
+   polymorphism will work with the two data types even they are different.
+   the "len" function will manage to work with both types.
