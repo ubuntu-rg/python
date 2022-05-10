@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %} System Logs {% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='admin.css')}}">
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300, 400,700|Inconsolata:400,700" rel="stylesheet">
+
+<!--     navbar-->
+    <nav class="navbar navbar-expand-md  navbar-light">
+        <div class="collapse navbar-collapse " id="myNavbar">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- sidebar navbar -->
+                    <div class="col-lg-3 col-xl-2 col-md-4 sidebar">
+                        <a href="#" class="navbar-brand text-white d-block mx-auto text-center mb-4 bottom-border pb-2">
+                        Admin Panel
+                        </a>
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" width="50"height="50" alt="nice" class="rounded-circle mr-3">
+                        <a href="#" class="text-white ">Admin </a>
+                        <div class="border-bottom pb-3"></div>
+                        <ul class="navbar-nav flex-column mt-4">
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/admin" class="nav-link text-light p-3 mb-2"> <i class="fa fa-home text-light fa-lg mr-3" aria-hidden="true"></i> Manage Accounts
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/admin/manage-forum" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-user text-light fa-lg mr-3" aria-hidden="true"></i> Manage Forum
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/user-inbox" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-envelope text-light fa-lg mr-3" aria-hidden="true"></i> Inbox
+                                {% if unread != 0 %}
+                                    <div class="spinner-grow text-info move-right" role="status">
+                                        <span class="text-dark">&nbsp;&nbsp;{{unread}}</span>
+                                    </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-shopping-cart text-light fa-lg mr-3" aria-hidden="true"></i> Sales
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-table text-light fa-lg mr-3" aria-hidden="true"></i> Analytics
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fas fa-table text-light fa-lg mr-3" aria-hidden="true"></i> Charts
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/admin/logs" class="nav-link text-light p-3 mb-2 sidebar-link current"> <i class="fa fa-table text-light fa-lg mr-3" aria-hidden="true"></i> Logs
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-wrench text-light fa-lg mr-3" aria-hidden="true"></i> Settings
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/admin/view" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-file text-light fa-lg mr-3" aria-hidden="true"></i> View Users DB
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/admin/view-forum" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-file text-light fa-lg mr-3" aria-hidden="true"></i> View Forum DB
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+<div class="container manage">
+    <textarea id="logs" name="logs" rows="30" cols="130">
+{% for line in logfile.splitlines() %}
+    {{line}}
+{% endfor %}
+    </textarea>
+</div>
+{% endblock %}

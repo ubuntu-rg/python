@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title%} New-Post {% endblock %}
+{% block content%}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='post.css')}}">
+<div class="container px-4 py-5 mx-auto">
+    <div class="row d-flex justify-content-center">
+        <div class="card">
+            <div class="row px-3">
+                <img class="profile-pic mr-3" src="https://www.shareicon.net/data/512x512/2016/05/24/770137_man_512x512.png">
+                <div class="flex-column">
+                    <h3 class="mb-0 font-weight-normal">Post by: {{ username }}</h3>
+                </div>
+            </div>
+            {% if "user" in session %}
+            <form action="#" method="POST">
+                <div class="row px-3 form-group">
+                    <textarea class="text-muted bg-light mt-4 mb-3 textarea-height" placeholder="Subject" name="subject" maxlength="50"></textarea>
+                </div>
+                <div class="row px-3 form-group">
+                    <textarea class="text-muted bg-light mt-4 mb-3" name="data" placeholder="Hi {{ username }}, what's on your mind today?"></textarea>
+                </div>
+                <div class="row px-3">
+                    <input type="submit" value="Post" class="btn btn-success ml-auto">
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

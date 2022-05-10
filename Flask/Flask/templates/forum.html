@@ -1,0 +1,99 @@
+{% extends 'base.html'%}
+{% block title%} Forum {% endblock %}
+{% block content%}
+<link rel="stylesheet" href="{{url_for('static', filename='forum.css')}}" type="text/css">
+<link rel="stylesheet" href="{{url_for('static', filename='forum-nav.css')}}" type="text/css">
+<link rel="stylesheet" href="{{url_for('static', filename='base.css')}}" type="text/css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<script src="{{url_for('static', filename='forum.js')}}"></script>-->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+			<div class="alert alert-warning" role="alert">
+			  {{msg}}
+			</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="container ">
+     <div class="container d-flex justify-content-center">
+        <nav aria-label="breadcrumb " class="first  d-md-flex" >
+             <ol class="breadcrumb indigo lighten-6 first-1 shadow-lg mb-5  ">
+                <li class="breadcrumb-item "><a class="black-text active-2" href="http://127.0.0.1:8080/forum/new-post"><span>New Post</span></a><img class="ml-md-3 ml-1" src="https://img.icons8.com/fluency-systems-filled/344/grip-lines-vertical.png" width="30" height="20"> </li>
+                <li class="breadcrumb-item "><a class="black-text active-2" href="http://127.0.0.1:8080"><span >Homepage</span></a><img class="ml-md-3 ml-1" src="https://img.icons8.com/fluency-systems-filled/344/grip-lines-vertical.png " width="30" height="20"></li>
+                <li class="breadcrumb-item "><a class="black-text active-2  " href="#"><span >Coming soon</span></a><img class="ml-md-3 ml-1" src="https://img.icons8.com/fluency-systems-filled/344/grip-lines-vertical.png" width="30" height="20"> </li>
+                 {% if not "user" in session %}
+                 <li class="breadcrumb-item  mr-0 pr-0"><a class="black-text active-1 active-2" href="http://127.0.0.1:8080/login">
+                             <span>
+                                 Login
+                             </span>
+                 </a>
+                 </li>
+                 {% else %}
+                 <li class="breadcrumb-item  mr-0 pr-0"><a class="black-text active-1 active-2" href="http://127.0.0.1:8080/logout">
+                             <span>
+                                 Logout
+                             </span>
+                 </a>
+                 </li>
+                 {% endif %}
+            </ol>
+        </nav>
+    </div>
+</div>
+
+{% for item in values %}
+<div class="container-fluid mt-100 container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="media flex-wrap w-100 align-items-center"> <img src="https://i.imgur.com/iNmBizf.jpg" class="d-block ui-w-40 rounded-circle" alt="">
+                        <div class="media-body ml-3"> <a href="javascript:void(0)" data-abc="true">{{ item.subject }} <div>{{ item.username }} #{{item._id}}</div></a>
+                            <div class="text-muted small">{{ item.post_date }}
+<!--                                Only logged in users can leave a like-->
+                                {% if "user" in session %}
+                            <form action="#" method="POST" style="display:inline-block">
+                                <button name="likes" value="likes-{{item._id}}"><i class="fa fa-heart text-danger like"></i></button><span class="align-middle">{{item.likes}}</span>
+                            </form>
+                                {% else %}
+                                <button name="likes" value="likes-{{item._id}}"><i class="fa fa-heart text-danger like"></i></button><span class="align-middle">{{item.likes}}</span>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+                        <div class="text-muted small ml-3">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body post">
+                    <p>{{ item.data }} <button class="btn catch" title="quote" id="quote" onclick="val=document.getElementsByClassName('post')[{{item._id - 1}}].textContent;val= 'quote of {{item.username}}: &quot;' +val.replace('\n', '').trim() + '&quot; \n'; document.getElementsByClassName('text-reply')[{{item._id - 1}}].value=val"><i class="fa fa-comment"></i></button></p>
+                </div>
+                {% for reply in replies %}
+                {% if reply.post_related_id == item._id%}
+                <div class="card-body reply">
+                    <hr>
+                    <div class="reply-username">{{ reply.post_date }} <br/> <strong>{{ reply.username }}</strong>: </div> {{ reply.data }}
+                </div>
+                {% endif %}
+                {% endfor %}
+                    {% if "user" in session %}
+                    <form action="#" method="POST">
+                        <div class="card-footer d-flex flex-wrap justify-content-between align-items-center px-0 pt-0 pb-3">
+                        <div class="px-4 pt-3"> <a href="javascript:void(0)" class="text-muted d-inline-flex align-items-center align-middle" data-abc="true">
+                        </a> </div>
+                        <textarea class="px-4 pt-3 text-reply" name="reply" placeholder="Click here to reply.." rows="2" cols="70"></textarea>
+                        <input type="hidden" name="postid" value="{{ item._id }}">
+                        <div class="px-4 pt-3"> <input type="submit" class="btn btn-primary" value="Reply"><i class="ion ion-md-create"></i> </div>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

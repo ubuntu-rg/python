@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title%} Admin Panel {% endblock %}
+{% block content%}
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='admin.css')}}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300, 400,700|Inconsolata:400,700" rel="stylesheet">
+
+<!--     navbar-->
+    <nav class="navbar navbar-expand-md  navbar-light">
+        <div class="collapse navbar-collapse " id="myNavbar">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- sidebar navbar -->
+                    <div class="col-lg-3 col-xl-2 col-md-4 sidebar">
+                        <a href="#" class="navbar-brand text-white d-block mx-auto text-center mb-4 bottom-border pb-2">
+                        Admin Panel
+                        </a>
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" width="50"height="50" alt="nice" class="rounded-circle mr-3">
+                        <a href="#" class="text-white ">Admin </a>
+                        <div class="border-bottom pb-3"></div>
+                        <ul class="navbar-nav flex-column mt-4">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 current"> <i class="fa fa-home text-light fa-lg mr-3" aria-hidden="true"></i> Manage Accounts
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/admin/manage-forum" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-user text-light fa-lg mr-3" aria-hidden="true"></i> Manage Forum
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/user-inbox" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-envelope text-light fa-lg mr-3" aria-hidden="true"></i> Inbox
+                                {% if unread != 0 %}
+                                    <div class="spinner-grow text-info move-right" role="status">
+                                        <span class="text-dark">&nbsp;&nbsp;{{unread}}</span>
+                                    </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-shopping-cart text-light fa-lg mr-3" aria-hidden="true"></i> Sales
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-table text-light fa-lg mr-3" aria-hidden="true"></i> Analytics
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fas fa-table text-light fa-lg mr-3" aria-hidden="true"></i> Charts
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/admin/logs" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-table text-light fa-lg mr-3" aria-hidden="true"></i> Logs
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-wrench text-light fa-lg mr-3" aria-hidden="true"></i> Settings
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/admin/view" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-file text-light fa-lg mr-3" aria-hidden="true"></i> View Users DB
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/admin/view-forum" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-file text-light fa-lg mr-3" aria-hidden="true"></i> View Forum DB
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+<form action="http://127.0.0.1:8080/user/admin" method="POST">
+    <div class="container manage">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for msg in messages %}
+        <div class="alert alert-danger" role="alert">
+            {{msg}}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Select</th>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">Email</th>
+                <th scope="col">UserID</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">fullname</th>
+                <th scope="col">address</th>
+                <th scope="col">Country</th>
+            </tr>
+            </thead>
+            {% for item in values %}
+            <tbody>
+            <tr>
+                {% if item.name == "admin" %}
+                <th><input type="checkbox" class="form-check-input" name="{{loop.index0}}" value="{{item.name}}" disabled></th>
+                {% else %}
+                <th><input type="checkbox" class="form-check-input" name="{{loop.index0}}" value="{{item.name}}"></th>
+                {% endif %}
+                <th scope="row">{{loop.index0}}</th>
+                <td>{{item.name}}</td>
+                <td>{{item.email}}</td>
+                <td>{{item._id}}</td>
+                <td>{{item.phonenumber}}</td>
+                <td>{{item.fullname}}</td>
+                <td>{{item.address}}</td>
+                <td>{{item.country}}</td>
+            </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+
+        <p></p>
+        <input type="submit" value="Delete Account" class="btn btn-danger">
+        </div>
+</form>
+<br/>
+
+
+
+{% endblock %}
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js " integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo " crossorigin="anonymous "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js " integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1 " crossorigin="anonymous "></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js " integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM " crossorigin="anonymous "></script>
+

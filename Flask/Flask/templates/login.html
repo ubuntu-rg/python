@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %} Login Page {% endblock %}
+{% block content %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+			<div class="alert alert-warning" role="alert">
+			  {{msg}}
+			</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link href="{{url_for('static', filename='login.css')}}" rel="stylesheet">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="{{url_for('static', filename='login.js')}}"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="login-reg-panel">
+	<form method="GET" action="http://127.0.0.1:8080/register">
+		<div class="register-info-box">
+			<h2>Don't have an account?</h2>
+			<p>Join us now - Fast and Easy!</p>
+			<button id="label-login" class="btn btn-success">Register</button>
+			<input type="radio" name="active-log-panel" id="log-login-show">
+		</div>
+	</form>
+		<form method="POST" action="#">
+			<div class="white-panel">
+				<div class="login-show">
+					<h2>LOGIN</h2>
+					<input type="text" placeholder="Username" name="username" autocomplete="off">
+					<input type="password" placeholder="Password" name="password" autocomplete="off">
+					<input type="submit" value="Login">
+					<a href="#">Forgot password?</a>
+				</div>
+			</div>
+		</form>
+	</div>
+{% endblock %}

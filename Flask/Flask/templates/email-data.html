@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %} Inbox {% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='admin.css')}}">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300, 400,700|Inconsolata:400,700" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='welcome.css')}}">
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='user-inbox.css')}}">
+
+<!--     navbar-->
+    <nav class="navbar navbar-expand-md  navbar-light">
+        <div class="collapse navbar-collapse " id="myNavbar">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- sidebar navbar -->
+                    <div class="col-lg-3 col-xl-2 col-md-4 sidebar">
+                        <a href="#" class="navbar-brand text-white d-block mx-auto text-center mb-4 bottom-border pb-2">
+                        {{ username if username }} Profile
+                        </a>
+                        <img src="https://cdn-icons-png.flaticon.com/512/147/147144.png" width="50"height="50" alt="nice" class="rounded-circle mr-3">
+                        <a href="#" class="text-white ">{{ username if username }} </a>
+                        <div class="border-bottom pb-3"></div>
+                        <ul class="navbar-nav flex-column mt-4">
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user" class="nav-link text-light p-3 mb-2"> <i class="fa fa-home text-light fa-lg mr-3" aria-hidden="true"></i> Profile
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/user-security" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-user text-light fa-lg mr-3" aria-hidden="true"></i> Security
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/user-statistics" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-book text-light fa-lg mr-3" aria-hidden="true"></i> Statistics
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/user-inbox" class="nav-link text-light p-3 mb-2 sidebar-link current"> <i class="fa fa-envelope text-light fa-lg mr-3" aria-hidden="true"></i> Inbox
+                                {% if unread != 0 %}
+                                    <div class="spinner-grow text-info move-right" role="status">
+                                        <span class="text-dark">&nbsp;&nbsp;{{unread}}</span>
+                                    </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-wrench text-light fa-lg mr-3" aria-hidden="true"></i> Settings
+                                </a>
+                            </li>
+                            {% if session["user"] == "admin" %}
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/admin" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-wrench text-light fa-lg mr-3" aria-hidden="true"></i> Admin Panel
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="container bootstrap snippets bootdeys manage">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="box">
+                <!--mail inbox start-->
+                <div class="mail-box">
+                    <aside class="sm-side">
+                        <div class="user-head">
+                            <div class="user-name">
+                                <h5><a href="#">{{username}}</a></h5>
+                                <span><a href="#">{{email if email}}</a></span>
+                            </div>
+                        </div>
+                        <div class="inbox-body">
+                            <a class="btn btn-success" data-toggle="modal" href="http://127.0.0.1:8080/user/user-inbox/compose" data-original-title="" title="">
+                                New Mail
+                            </a>
+                            <!-- Modal -->
+                            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            <h4 class="modal-title">Compose</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="form-horizontal" role="form">
+                                                <div class="form-group">
+                                                    <label class="col-lg-2 control-label">To</label>
+                                                    <div class="col-lg-10">
+                                                        <input type="text" class="form-control" id="inputEmail1" placeholder="">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-lg-2 control-label">Cc / Bcc</label>
+                                                    <div class="col-lg-10">
+                                                        <input type="text" class="form-control" id="cc" placeholder="">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-lg-2 control-label">Subject</label>
+                                                    <div class="col-lg-10">
+                                                        <input type="text" class="form-control" id="inputPassword1" placeholder="">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-lg-2 control-label">Message</label>
+                                                    <div class="col-lg-10">
+                                                        <textarea name="" id="" class="form-control" cols="30" rows="10"></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="col-lg-offset-2 col-lg-10">
+                                                    <span class="btn green fileinput-button" data-original-title="" title="">
+                                                      <i class="fa fa-plus fa fa-white"></i>
+                                                      <span>Attachment</span>
+                                                      <input type="file" multiple="" name="files[]">
+                                                    </span>
+                                                        <button type="submit" class="btn btn-send" data-original-title="" title="">Send</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal-dialog -->
+                            </div><!-- /.modal -->
+                        </div>
+
+                        <ul class="inbox-nav inbox-divider">
+                            <li class="active">
+                                <a href="http://127.0.0.1:8080/user/user-inbox"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger pull-right">{{unread}}</span></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-envelope-o"></i> Sent Mail</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-bookmark-o"></i> Important</a>
+                            </li>
+                            <li>
+                                <a href="#"><i class=" fa fa-trash-o"></i> Trash</a>
+                            </li>
+                        </ul>
+                    </aside>
+                    <aside class="lg-side">
+                        <div class="inbox-head">
+                    <h3>View Mail</h3>
+                    <form class="pull-right position" action="#">
+                        <div class="input-append">
+                            <input type="text" placeholder="Search Mail" class="sr-input">
+                            <button type="button" class="btn sr-btn" data-original-title="" title=""><i class="fa fa-search"></i></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="inbox-body">
+                    <div class="heading-inbox row">
+                        <div class="col-md-8">
+                            <div class="compose-btn">
+                                <a class="btn btn-sm btn-primary" href="mail_compose.html" data-original-title="" title=""><i class="fa fa-reply"></i> Reply</a>
+                                <button title="" data-placement="top" data-toggle="tooltip" type="button" data-original-title="Print" class="btn  btn-sm tooltips"><i class="fa fa-print"></i> </button>
+                                <button title="" data-placement="top" data-toggle="tooltip" data-original-title="Trash" class="btn btn-sm tooltips"><i class="fa fa-trash-o"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <p class="date"> {{found_email.sent_date}}</p>
+                        </div>
+                        <div class="col-md-12">
+                            <h4>{{found_email.subject}}</h4>
+                        </div>
+                    </div>
+                    <div class="sender-info">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <img alt="" src="https://bootdey.com/img/Content/avatar/avatar6.png">
+                                <strong>{{found_email.sender}}</strong>
+                                <span>{{found_email.email}}</span>
+                                to
+                                <strong>me ({{username}})</strong>
+                                <a class="sender-dropdown " href="javascript:;">
+                                    <i class="fa fa-chevron-down"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="view-mail">
+                        <p>
+                        {{found_email.data}}
+                        <p/>
+                    </div>
+                    <div class="compose-btn pull-left">
+                        <a class="btn btn-sm btn-primary" href="mail_compose.html" data-original-title="" title=""><i class="fa fa-reply"></i> Reply</a>
+                        <button class="btn btn-sm " data-original-title="" title=""><i class="fa fa-arrow-right"></i> Forward</button>
+                        <button title="" data-placement="top" data-toggle="tooltip" type="button" data-original-title="Print" class="btn  btn-sm tooltips"><i class="fa fa-print"></i> </button>
+                        <button title="" data-placement="top" data-toggle="tooltip" data-original-title="Trash" class="btn btn-sm tooltips"><i class="fa fa-trash-o"></i></button>
+                    </div>
+                </div>
+                    </aside>
+                </div>
+                <!--mail inbox end-->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

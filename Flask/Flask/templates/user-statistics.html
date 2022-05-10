@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %} Statistics {% endblock %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='admin.css')}}">
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300, 400,700|Inconsolata:400,700" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='welcome.css')}}">
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='user-statistics.css')}}">
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-success" role="alert">
+			  {{msg}}
+			</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300, 400,700|Inconsolata:400,700" rel="stylesheet">
+<!--     navbar-->
+    <nav class="navbar navbar-expand-md  navbar-light">
+        <div class="collapse navbar-collapse " id="myNavbar">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- sidebar navbar -->
+                    <div class="col-lg-3 col-xl-2 col-md-4 sidebar">
+                        <a href="#" class="navbar-brand text-white d-block mx-auto text-center mb-4 bottom-border pb-2">
+                        {{ username if username }} Profile
+                        </a>
+                        <img src="https://cdn-icons-png.flaticon.com/512/147/147144.png" width="50"height="50" alt="nice" class="rounded-circle mr-3">
+                        <a href="#" class="text-white ">{{ username if username }} </a>
+                        <div class="border-bottom pb-3"></div>
+                        <ul class="navbar-nav flex-column mt-4">
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user" class="nav-link text-light p-3 mb-2"> <i class="fa fa-home text-light fa-lg mr-3" aria-hidden="true"></i> Profile
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/user-security" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-user text-light fa-lg mr-3" aria-hidden="true"></i> Security
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/user-statistics" class="nav-link text-light p-3 mb-2 sidebar-link current"> <i class="fa fa-book text-light fa-lg mr-3" aria-hidden="true"></i> Statistics
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/user-inbox" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-envelope text-light fa-lg mr-3" aria-hidden="true"></i> Inbox
+                                {% if unread != 0 %}
+                                    <div class="spinner-grow text-info move-right" role="status">
+                                        <span class="text-dark">&nbsp;&nbsp;{{unread}}</span>
+                                    </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-wrench text-light fa-lg mr-3" aria-hidden="true"></i> Settings
+                                </a>
+                            </li>
+                            {% if session["user"] == "admin" %}
+                            <li class="nav-item">
+                                <a href="http://127.0.0.1:8080/user/admin" class="nav-link text-light p-3 mb-2 sidebar-link"> <i class="fa fa-wrench text-light fa-lg mr-3" aria-hidden="true"></i> Admin Panel
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+<div class="container manage">
+    <div class="page-content page-container" id="page-content">
+        <div class="padding">
+            <div class="row container d-flex justify-content-center">
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Users Statistics</h4>
+                            <p class="card-description">
+                                Become the most influence account
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            User
+                                        </th>
+                                        <th>
+                                            First name
+                                        </th>
+                                        <th>
+                                            Progress
+                                        </th>
+                                        <th>
+                                            Posts
+                                        </th>
+                                        <th>
+                                            Replies
+                                        </th>
+<!--                                        <th>-->
+<!--                                            Likes-->
+<!--                                        </th>-->
+                                        <th>
+                                            Date Created
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for account in accounts %}
+                                    <tr>
+                                        <td class="py-1">
+                                            <img src="https://img.icons8.com/color/36/000000/administrator-male.png" alt="image">
+                                        </td>
+                                        <td>
+                                                {{account.name}}
+                                        </td>
+                                        <td>
+                                            {% if account.post_counter + account.replies_counter <= 10 %}
+                                            <div class="progress">
+                                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{account.post_counter + account.replies_counter}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            {% elif 10 < account.post_counter + account.replies_counter <= 25 %}
+                                            <div class="progress">
+                                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{account.post_counter + account.replies_counter}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            {% elif 25 < account.post_counter + account.replies_counter <= 50 %}
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" role="progressbar" style="width: {{account.post_counter + account.replies_counter}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            {% else %}
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{account.post_counter + account.replies_counter}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{account.post_counter}}
+                                        </td>
+                                        <td>
+                                            {{account.replies_counter}}
+                                        </td>
+<!--                                        <td>-->
+<!--                                                {{account.amount_user_likes}}-->
+<!--                                        </td>-->
+                                        <td>
+                                            {{account.created_date}}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

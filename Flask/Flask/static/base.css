@@ -1,0 +1,15 @@
+body{
+background-image:url("https://hdwallsource.com/img/2014/9/blur-26347-27038-hd-wallpapers.jpg");
+background-repeat:no-repeat;
+background-size:cover;
+padding:0px;}
+}
+
+.nav-link{
+    transition: all 0.7s;
+}
+
+.nav-link:hover{
+    background-color: #898989;
+    transition: all 0.7s;
+}
