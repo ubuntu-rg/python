@@ -1,0 +1,111 @@
+@Library('') _
+
+properties([
+ parameters([
+    string
+    (
+        defaultValue: 'slave_name',
+        description: 'Node name',
+        name: 'NODE_NAME'
+    ),
+    booleanParam
+    (
+        defaultValue: false,
+        description: 'Reload Job Params',
+        name: 'Refresh'
+    )
+  ])
+])
+
+pipeline {
+  agent {
+    node {
+      label "${NODE_NAME}"
+    }
+  }
+  options {
+    timestamps ()
+    ansiColor('xterm')
+    disableConcurrentBuilds()
+    timeout(time: 2880, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
+  }
+  
+  triggers {
+    cron('H 1 * * *')
+  }
+
+  stages {
+    stage("Do Something") {
+      steps {
+        script {
+          BUILD_NEW_CHROMIUM = false
+          VERSION = getlastversion
+          if (VERSION == null || VERSION.equals("")) {
+            currentBuild.result = 'ABORTED'
+            error("Could not retrieve chromium version for [android][stable] version. Error:  ${VERSION}. Stopping early…")
+          } else {
+            echo ".."
+            
+            repo_tag_version = sh (script: "git describe --abbrev=0 --tags --always",returnStdout: true).trim()
+            echo "Got version from the latest repo tag: ${repo_tag_version}"
+
+            artifactory_tag_version = jfrog.getItemProperties('folder', 'folder1', 'folder2')
+            echo "Got version from the latest artifactory tag: ${artifactory_tag_version}"
+            
+            
+            if (VERSION != artifactory_tag_version) {
+              BUILD_NEW_CHROMIUM = true
+              manager.addShortText("New Version detected ${VERSION}")
+            } else {
+              common.setTagToPipeline("Version has not changed ${VERSION}")
+            }
+          }
+        }
+      }
+    }
+    stage("Run Build Job") {
+      when { expression { return (BUILD_NEW_CHROMIUM == true) } }
+      steps {
+        script {
+          //lock(resource: 'chromium-build-lock', skipIfLocked: true) {
+            run_job = build job: 'path/to/job', parameters: [string(name: 'BRANCH', value: "etc.."), string(name: 'NODE_NAME', value: 'slave')]
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "always"
+      script {
+        icon = "✅"
+        if (currentBuild.currentResult == 'FAILURE') {
+            icon = "❌"
+        }
+        if (currentBuild.currentResult == 'ABORTED') {
+            icon = "⚠️"
+        }
+        common.setTagToPipeline("${icon} current ${artifactory_tag_version} web ${VERSION}")
+        emailext(
+          body: '''${SCRIPT, template="groovy-html.template"}''',
+          to: 'someemail@gmail.com',
+          subject: "${icon} ${currentBuild.currentResult}: text ${VERSION}"
+        )
+      }
+    }
+    success {
+      echo "success"
+ 
+    }
+    failure {
+      echo "failure"
+    }
+    cleanup {
+      echo "cleanup"
+      dir("${env.WORKSPACE}@tmp") {
+        deleteDir()
+      }
+    }
+  }
+}
