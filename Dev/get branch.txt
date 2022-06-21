@@ -1,0 +1,15 @@
+
+            def branches = []
+
+            def gettags = ('git ls-remote -t -h ssh://git@bitbucket.com:port/path/to/repo.git').execute()
+
+            gettags.text.readLines().collect {
+             branch=it.split()[1].replaceAll('refs/heads/', '').replaceAll('refs/tags/', 'Tag: ').replaceAll('\\^\\{\\}', '')
+             if (branch == 'master') {
+                branches.add(branch + ':selected')
+              } else {
+                branches.add(branch)
+             }
+            }
+            branches.removeAll([''])
+            return branches
