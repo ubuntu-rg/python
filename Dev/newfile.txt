@@ -1,0 +1,155 @@
+@Library('') _
+
+pipeline {
+  agent {
+    docker {
+      image "${DOCKER_IMAGE}"
+      label "${NODE_NAME}"
+      args "-v ${DATA_PATH}:${DATA_PATH} --privileged"
+    }
+  }
+  options {
+    timestamps ()
+    ansiColor('xterm')
+    disableConcurrentBuilds()
+    timeout(time: 2880, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
+    lock resource: "..."
+  }
+
+  stages {
+    stage('Refresh') {
+                  when { expression { return (REFRESH == 'true') } }
+                  steps { script { currentBuild.result = 'ABORTED'
+                      error('Reloading params ... Stopping early…')
+              } } }
+
+    stage('GIT Checkout') {
+      steps {
+        script {
+          println "Clean WS"
+          cleanWs disableDeferredWipeout: true, deleteDirs: true
+
+          println "GIT Checkout"
+          scmVars = checkout ([
+              $class: 'GitSCM',
+              branches: [[name: "*/${BRANCH}"]],
+              browser: [$class: 'Stash',
+              repoUrl: 'https://bitbucket.com/projects/path/to/repo'],
+              doGenerateSubmoduleConfigurations: false,
+              extensions: [
+                [$class: 'LocalBranch', localBranch: "$BRANCH"],
+                [$class: 'SubmoduleOption', 
+                  disableSubmodules: false, 
+                  parentCredentials: true, 
+                  recursiveSubmodules: true, 
+                  reference: '', 
+                  trackingSubmodules: false 
+                ]
+              ],
+              submoduleCfg: [],
+              userRemoteConfigs: [[credentialsId: 'uuid',
+                              url: 'ssh://git@bitbucket.com:port/path/to/repo.git']]
+          ])
+        if (VERSION.endsWith(',')) {
+          VERSION = VERSION.substring(0, VERSION.length() - 1)
+        }
+        _tag_version = sh (script: "git describe --abbrev=0 --tags --always",returnStdout: true).trim()
+        common.setTagToPipeline("text")
+        }
+      }
+    }
+
+    stage("Create ENV"){
+      when { expression { return (BYPASS_CREATE_ENV_STAGE == 'false') } }
+      steps{
+        script{
+          sh """
+            echo "Create ENV"
+            bash ...
+          """
+        }
+      }
+    }
+
+    stage("...") {
+      when { expression { return (BYPASS_BUILD_STAGE == 'false') } }
+      steps{
+        script{
+            echo "${VERSION}"
+          sh """
+            echo "Build"
+            bash ...
+          """
+        }
+      }
+    }
+  }
+  post {
+    always {
+      echo "always"
+      script {
+        icon = "✅"
+        if (currentBuild.currentResult == 'FAILURE') {
+            icon = "❌"
+        }
+        if (currentBuild.currentResult == 'ABORTED') {
+            icon = "⚠️"
+        }
+        emailext (
+          body: '''${SCRIPT, template="groovy-html.template"}''',
+          to: 'rg15@pl.local',
+          subject: "${icon} ${currentBuild.currentResult}: "
+        )
+        notifyBitbucket(
+          considerUnstableAsSuccess: false, 
+          commitSha1: "${scmVars.GIT_COMMIT}", 
+          buildStatus: "${currentBuild.result}", 
+          buildName: '', 
+          credentialsId: 'uuid', 
+          disableInprogressNotification: false, 
+          ignoreUnverifiedSSLPeer: false, 
+          includeBuildNumberInKey: false, 
+          prependParentProjectKey: false, 
+          projectKey: '', 
+          stashServerBaseUrl: 'https://bitbucket.com'
+        )
+      }
+    }
+    success {
+      echo "success"
+        script {
+            manager.addShortText("${VERSION}")
+            commit_hash = sh (script: "git log | grep commit | head -n 1 | cut -d ' ' -f 2", returnStdout: true).trim()
+            writeFile file: "/data/place_${VERSION}/out/commit_id.txt", text: "${commit_hash}"
+            
+            // compress all relevant files to tar.gz and upload it to the artifactory 
+            sh """
+            cd /data/place_${VERSION}/out
+            cp ${WORKSPACE}/scripts/*.py .
+            tar -cvzf /data/place_${VERSION}/out/file.tar.gz *.py
+            md5sum file.tar.gz| cut -d " " -f 1 > md5sum_hash.txt
+            """
+            
+          catchError(buildResult: 'SUCCESS', message: 'Commit ID was not uploaded successfully', stageResult: 'UNSTABLE') {
+                uploadToArtifactory(
+                  serverId: "artifactory",
+                  pattern: "/data/place_${VERSION}/out/commit_id*",
+                  target: "path/in/artifactory/,
+                  props: "version=${VERSION};tag_name=${tag_version};commit_hash_id=${commit_hash}"
+              )
+            }
+          
+        }
+    }
+    failure {
+      echo "failure"
+    }
+    cleanup {
+      echo "cleanup"
+      dir("${env.WORKSPACE}@tmp") {
+        deleteDir()
+      }
+    }
+  }
+}
